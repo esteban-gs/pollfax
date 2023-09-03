@@ -1,0 +1,13 @@
+services:
+  
+  db:
+    image: postgres:14
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+      - POSTGRES_DB=$DB_NAME
+    
+    volumes:
+      - ./dev-resources/create_dev_db.sql:/docker-entrypoint-initdb.d/create_dev_db.sql
