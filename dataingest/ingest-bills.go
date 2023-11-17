@@ -1,4 +1,4 @@
-package dataingestion
+package dataingest
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"pollfax/db"
 	"regexp"
 	"strconv"
 	"time"
@@ -51,6 +52,7 @@ type Bill struct {
 	UpdateDate              string    `json:"updateDate"`
 	UpdateDateIncludingText time.Time `json:"updateDateIncludingText"`
 	URL                     string    `json:"url"`
+	Created                 time.Time `json:"created"`
 }
 
 type BillsResponse struct {
@@ -125,9 +127,59 @@ func GetBills(congress int64) (bills []Bill) {
 	return response.Bills
 }
 
-func PersistBills(bills []Bill) {
-	for _, bill := range bills {
-		log.Info().Str("bill", bill.Number).Msg("Saving bill")
-		// bill.Save()
+func Clear() {
+	_db := db.Instance()
+	tx := _db.MustBegin()
+	log.Info().Str("dataingest", "Clear").Msg("Removing existing bills")
+	tx.Exec(`TRUNCATE bills`)
+	commitErr := tx.Commit()
+	if commitErr != nil {
+		log.Error().Err(commitErr).Msg("Error Clearing Bills")
 	}
+}
+
+func Persist(bills *[]Bill) {
+	_db := db.Instance()
+	tx := _db.MustBegin()
+	for _, bill := range *bills {
+		log.Info().Str("bill", bill.Number+bill.Type).Msg("Saving bill")
+		tx.Exec(`INSERT INTO bills
+		(congress,
+		bill_number,
+		origin_chamber,
+		origin_chamber_code,
+		title,
+		type,
+		url,
+		latest_action_date,
+		latest_action_text,
+		update_date,
+		update_including_text,
+		created)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+			bill.Congress,
+			bill.Number,
+			bill.OriginChamber,
+			bill.OriginChamberCode,
+			bill.Title,
+			bill.Type,
+			bill.URL,
+			bill.LatestAction.ActionDate,
+			bill.LatestAction.Text,
+			bill.UpdateDate,
+			bill.UpdateDateIncludingText,
+			time.Now().UTC(),
+		)
+	}
+	commitErr := tx.Commit()
+	if commitErr != nil {
+		log.Error().Err(commitErr).Msg("Error inserting Bills")
+	}
+}
+
+func Run() {
+	Clear()
+	congress := GetLatestCongress()
+	bills := GetBills(congress)
+	Persist(&bills)
 }

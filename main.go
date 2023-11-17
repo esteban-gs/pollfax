@@ -7,11 +7,12 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+
 	// "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 
-	"pollfax/database"
-	"pollfax/dataingestion"
+	"pollfax/dataingest"
+	"pollfax/db"
 	// "pollfax/model"
 )
 
@@ -22,19 +23,12 @@ func loadAppEnv() {
 	}
 }
 
-func connectAndMigrateDb() {
-	database.ApplyMigrations()
-}
-
 func main() {
 	loadAppEnv()
 
-	connectAndMigrateDb()
+	db.ApplyMigrations()
 
-	// dataingestion.ReadData()
-
-	congress := dataingestion.GetLatestCongress()
-	dataingestion.GetBills(congress)
+	dataingest.Run()
 
 	// c := cron.New()
 	// c.AddFunc("@daily", func() { dataingestion.Bills() })

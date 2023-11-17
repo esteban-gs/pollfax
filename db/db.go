@@ -1,25 +1,33 @@
-package database
+package db
 
 import (
 	"database/sql"
 	"fmt"
+
 	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/rs/zerolog/log"
 )
 
-func ApplyMigrations() {
+func ConnectionString() string {
 	host := os.Getenv("DB_HOST")
 	username := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	databaseName := os.Getenv("DB_NAME")
 	port := os.Getenv("DB_PORT")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		host, username, password, databaseName, port)
+}
+
+func ApplyMigrations() {
+	databaseName := os.Getenv("DB_NAME")
+	dsn := ConnectionString()
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		panic(err)
@@ -28,7 +36,7 @@ func ApplyMigrations() {
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://database/migrations",
+		"file://db/migrations",
 		databaseName,
 		driver)
 	if err != nil {
@@ -38,4 +46,14 @@ func ApplyMigrations() {
 	if err != nil && err != migrate.ErrNoChange {
 		panic(err)
 	}
+}
+
+func Instance() *sqlx.DB {
+	dsn := ConnectionString()
+	db, err := sqlx.Connect("postgres", dsn)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Error connecting to database")
+		panic(err)
+	}
+	return db
 }
