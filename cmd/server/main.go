@@ -11,7 +11,7 @@ import (
 	// "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 
-	"pollfax/ingest"
+	"pollfax/internal/ingest"
 	"pollfax/db"
 	// "pollfax/model"
 )
