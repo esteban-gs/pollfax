@@ -20,9 +20,10 @@ func ConnectionString() string {
 	password := os.Getenv("DB_PASSWORD")
 	databaseName := os.Getenv("DB_NAME")
 	port := os.Getenv("DB_PORT")
+	sslmode := os.Getenv("DB_SSLMODE")
 
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		host, username, password, databaseName, port)
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		host, username, password, databaseName, port, sslmode)
 }
 
 func ApplyMigrations() {
@@ -30,6 +31,7 @@ func ApplyMigrations() {
 	dsn := ConnectionString()
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
+		log.Fatal().Err(err).Msg("Error applying migrations")
 		panic(err)
 	}
 	defer db.Close()
@@ -46,6 +48,7 @@ func ApplyMigrations() {
 	if err != nil && err != migrate.ErrNoChange {
 		panic(err)
 	}
+	log.Info().Msg("Successfully applied migrations")
 }
 
 func Instance() *sqlx.DB {

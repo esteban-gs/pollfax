@@ -1,4 +1,4 @@
-package dataingest
+package ingest
 
 import (
 	"encoding/json"
@@ -59,7 +59,7 @@ type BillsResponse struct {
 	Bills []Bill `json:"bills"`
 }
 
-func GetLatestCongress() (number int64) {
+func latestCongress() (number int64) {
 	apiKey := os.Getenv("CONGRESS_API_KEY")
 	params := url.Values{}
 	params.Add("format", "json")
@@ -98,7 +98,7 @@ func GetLatestCongress() (number int64) {
 	return
 }
 
-func GetBills(congress int64) (bills []Bill) {
+func bills(congress int64) (bills []Bill) {
 	apiKey := os.Getenv("CONGRESS_API_KEY")
 	params := url.Values{}
 	params.Add("format", "json")
@@ -127,7 +127,7 @@ func GetBills(congress int64) (bills []Bill) {
 	return response.Bills
 }
 
-func Clear() {
+func clear() {
 	_db := db.Instance()
 	tx := _db.MustBegin()
 	log.Info().Str("dataingest", "Clear").Msg("Removing existing bills")
@@ -138,7 +138,7 @@ func Clear() {
 	}
 }
 
-func Persist(bills *[]Bill) {
+func persist(bills *[]Bill) {
 	_db := db.Instance()
 	tx := _db.MustBegin()
 	for _, bill := range *bills {
@@ -178,8 +178,8 @@ func Persist(bills *[]Bill) {
 }
 
 func Run() {
-	Clear()
-	congress := GetLatestCongress()
-	bills := GetBills(congress)
-	Persist(&bills)
+	clear()
+	congress := latestCongress()
+	bills := bills(congress)
+	persist(&bills)
 }

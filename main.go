@@ -11,7 +11,7 @@ import (
 	// "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 
-	"pollfax/dataingest"
+	"pollfax/ingest"
 	"pollfax/db"
 	// "pollfax/model"
 )
@@ -28,7 +28,7 @@ func main() {
 
 	db.ApplyMigrations()
 
-	dataingest.Run()
+	ingest.Run()
 
 	// c := cron.New()
 	// c.AddFunc("@daily", func() { dataingestion.Bills() })
