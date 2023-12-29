@@ -1,4 +1,5 @@
 CREATE TABLE bills (
+    id SERIAL PRIMARY KEY,
     congress VARCHAR(255),
     bill_number INT,
     origin_chamber VARCHAR(10),
@@ -10,6 +11,5 @@ CREATE TABLE bills (
     latest_action_text VARCHAR(1024),
     update_date TIMESTAMP,
     update_including_text DATE,
-    PRIMARY KEY (type, bill_number),
     created TIMESTAMP
 );

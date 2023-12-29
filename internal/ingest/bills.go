@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"pollfax/db"
+	"pollfax/internal/dto"
 	"regexp"
 	"strconv"
 	"time"
@@ -177,9 +178,39 @@ func persist(bills *[]Bill) {
 	}
 }
 
+func get() []dto.BillRes {
+	_db := db.Instance()
+	bills := []dto.BillRes{}
+	_db.Select(&bills, `SELECT title,
+                              type,
+													    bill_number,
+													    origin_chamber,
+													    url,
+													    latest_action_text,
+													    update_including_text
+									           FROM bills`)
+	return bills
+}
+
+func saveToFile(bills *[]dto.BillRes) {
+	file, err := os.Create("public/bills.json")
+	if err != nil {
+		log.Err(err).Msg("Error creating file")
+	}
+	defer file.Close()
+
+	b, err := json.Marshal(bills)
+	if err != nil {
+		log.Err(err).Msg("Error marshalling bills")
+	}
+	file.Write(b)
+}
+
 func Run() {
 	clear()
 	congress := latestCongress()
 	bills := bills(congress)
 	persist(&bills)
+	dbBills := get()
+	saveToFile(&dbBills)
 }
