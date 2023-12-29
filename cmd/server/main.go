@@ -1,19 +1,18 @@
 package main
 
 import (
-	// "net/http"
-	"time"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-
-	// "github.com/robfig/cron/v3"
-	"github.com/rs/zerolog/log"
-
-	"pollfax/internal/ingest"
+	"os"
 	"pollfax/db"
-	// "pollfax/model"
+	"pollfax/internal/handlers"
+	"pollfax/internal/ingest"
+
+	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
+	"github.com/robfig/cron/v3"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func loadAppEnv() {
@@ -28,32 +27,31 @@ func main() {
 
 	db.ApplyMigrations()
 
-	ingest.Run()
+	// RUN DATA PIPELINE NIGHTLY
+	c := cron.New()
+	c.AddFunc("@daily", func() { ingest.Run() })
+	c.Start()
 
-	// c := cron.New()
-	// c.AddFunc("@daily", func() { dataingestion.Bills() })
-	// c.Start()
+	e := echo.New()
+	e.Use(middleware.CORS())
 
-	r := gin.Default()
+	logger := zerolog.New(os.Stdout)
 
-	// Apply the CORS middleware
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"*"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"*"}
-	config.ExposeHeaders = []string{"*"}
-	config.AllowCredentials = true
-	config.MaxAge = 12 * time.Hour
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogURI:    true,
+		LogStatus: true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			logger.Info().
+				Str("URI", v.URI).
+				Int("status", v.Status).
+				Msg("request")
 
-	r.Use(cors.New(config))
+			return nil
+		},
+	}))
 
-	// r.GET("/ping", func(c *gin.Context) {
-	// 	bills, err := model.GetBills()
-	// 	if err != nil {
-	// 		log.Err(err)
-	// 	}
-	// 	c.JSON(http.StatusOK, bills)
-	// })
+	e.GET("/bills", handlers.GetAll)
+	e.File("/bills.json", "public/bills.json")
 
-	r.Run()
+	e.Logger.Fatal(e.Start(":1323"))
 }
