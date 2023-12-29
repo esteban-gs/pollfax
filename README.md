@@ -22,3 +22,10 @@ The pollfax MVP will accomplish the following
 - Let users browse the most recently updated bills.
 - Users can up/downvote bills -> this is persisted in a database
 - Dashboard TBD
+
+
+## Database Schema Version Control
+
+### Create New Migration
+- run `migrate create -ext sqlx -dir db/migrations -seq create_bills_sentiment_table`
+- add the necessary sql
