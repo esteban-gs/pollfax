@@ -52,6 +52,7 @@ func main() {
 
 	e.GET("/bills", handlers.GetAll)
 	e.File("/bills.json", "public/bills.json")
+	e.POST("/bills/sentiments", handlers.CreateBillSentiment)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
