@@ -26,3 +26,6 @@ go.work
 
 .env
 .vscode
+
+# PUBLIC CONTENT
+public/bills.json
