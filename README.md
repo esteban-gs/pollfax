@@ -8,6 +8,9 @@
     - [Roadmap](#roadmap)
   - [Database Schema Version Control](#database-schema-version-control)
     - [Create New Migration](#create-new-migration)
+  - [Commands](#commands)
+  - [`server/main`](#servermain)
+  - [`ingest/main`](#ingestmain)
 <!--toc:end-->
 
 ## Summary
