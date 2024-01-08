@@ -9,8 +9,8 @@
   - [Database Schema Version Control](#database-schema-version-control)
     - [Create New Migration](#create-new-migration)
   - [Commands](#commands)
-  - [`server/main`](#servermain)
-  - [`ingest/main`](#ingestmain)
+    - [`server/main`](#servermain)
+    - [`ingest/main`](#ingestmain)
 <!--toc:end-->
 
 ## Summary
@@ -51,10 +51,10 @@ The pollfax MVP will accomplish the following
 
 ## Commands
 
-## `server/main`
+### `server/main`
 
 Starts the http server.
 
-## `ingest/main`
+### `ingest/main`
 
 Runs the bills igestion command.
