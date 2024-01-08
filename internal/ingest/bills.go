@@ -181,14 +181,15 @@ func persist(bills *[]Bill) {
 func get() []dto.BillRes {
 	_db := db.Instance()
 	bills := []dto.BillRes{}
-	_db.Select(&bills, `SELECT title,
-                              type,
-													    bill_number,
-													    origin_chamber,
-													    url,
-													    latest_action_text,
-													    update_including_text
-									           FROM bills`)
+	_db.Select(&bills, `SELECT id,
+		title,
+    type,
+		bill_number,
+		origin_chamber,
+		url,
+		latest_action_text,
+		update_including_text
+	FROM bills`)
 	return bills
 }
 

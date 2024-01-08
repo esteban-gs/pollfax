@@ -5,26 +5,17 @@ import (
 	"pollfax/db"
 	"pollfax/internal/handlers"
 	"pollfax/internal/ingest"
+	"pollfax/internal/util"
 
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
-func loadAppEnv() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Info().Msg("Error loading .env file")
-	}
-}
-
 func main() {
-	loadAppEnv()
-
+	util.LoadAppEnv()
 	db.ApplyMigrations()
 
 	// RUN DATA PIPELINE NIGHTLY
