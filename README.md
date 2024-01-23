@@ -57,4 +57,4 @@ Starts the http server.
 
 ### `ingest/main`
 
-Runs the bills igestion command.
+Runs the bills igestion command ad-hoc command.
