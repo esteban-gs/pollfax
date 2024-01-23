@@ -129,6 +129,7 @@ func bills(congress int64) (bills []Bill) {
 }
 
 func clear() {
+	log.Fatal().Msg("COMMENT ME BEFORE PROCEDING")
 	_db := db.Instance()
 	tx := _db.MustBegin()
 	log.Info().Str("dataingest", "Clear").Msg("Removing existing bills")
@@ -157,7 +158,20 @@ func persist(bills *[]Bill) {
 		update_date,
 		update_including_text,
 		created)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+
+		ON CONFLICT (type, bill_number)
+		DO UPDATE
+		SET
+			origin_chamber = EXCLUDED.origin_chamber,
+			origin_chamber_code = EXCLUDED.origin_chamber_code,
+			title = EXCLUDED.title,
+			url = EXCLUDED.url,
+			latest_action_date = EXCLUDED.latest_action_date,
+			latest_action_text = EXCLUDED.latest_action_text,
+			update_date = EXCLUDED.update_date,
+			update_including_text = EXCLUDED.update_including_text
+			`,
 			bill.Congress,
 			bill.Number,
 			bill.OriginChamber,
@@ -208,7 +222,6 @@ func saveToFile(bills *[]dto.BillRes) {
 }
 
 func Run() {
-	clear()
 	congress := latestCongress()
 	bills := bills(congress)
 	persist(&bills)
