@@ -33,7 +33,7 @@ data points to ingest are:
 
 - Current congress number. e.g 118th congress, etc.
 - Get first ~250 bills belonging to the 118th congress.
-- Persist the bills to a transient bills table.
+- Persist the bills to a bills table.
 
 ### Roadmap
 
