@@ -19,7 +19,6 @@ type BillSentiment struct {
 }
 
 type CreateBillSentiment struct {
-	Id        int64     `db:"id" json:"id"`
 	Sentiment string    `db:"sentiment" json:"sentiment"`
 	VotedOn   time.Time `db:"voted_on" json:"votedOn"`
 	BillId    int64     `db:"bill_id" json:"billId"`
