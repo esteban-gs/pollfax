@@ -103,7 +103,7 @@ func bills(congress int64) (bills []Bill) {
 	apiKey := os.Getenv("CONGRESS_API_KEY")
 	params := url.Values{}
 	params.Add("format", "json")
-	params.Add("limit", "50")
+	params.Add("limit", "250")
 	params.Add("sort", "updateDate+desc")
 	params.Add("api_key", apiKey)
 	dataUrl := fmt.Sprintf("https://api.congress.gov/v3/bill/%d?%s", congress, params.Encode())
@@ -203,7 +203,9 @@ func get() []dto.BillRes {
 		url,
 		latest_action_text,
 		update_including_text
-	FROM bills`)
+	FROM bills
+	ORDER BY update_date DESC
+	LIMIT 250`)
 	return bills
 }
 
