@@ -1,4 +1,4 @@
-# Pollfax
+# GO versio of Pollfax
 
 <!--toc:start-->
 - [Pollfax](#pollfax)
